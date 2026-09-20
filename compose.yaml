@@ -1,0 +1,13 @@
+services:
+  # The FastAPI app
+  api:
+    # Build from the Dockerfile in this folder instead of pulling a ready-made image
+    build: .
+    ports:
+      # host port : container port - lets your Mac reach http://localhost:8000
+      - "8000:8000"
+    volumes:
+      # Live-mount your project over /app so hot reload picks up edits instantly
+      - .:/app
+      # Anonymous volume - stops your macOS .venv from burying the container's Linux one
+      - /app/.venv
