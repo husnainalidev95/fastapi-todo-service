@@ -11,3 +11,36 @@ services:
       - .:/app
       # Anonymous volume - stops your macOS .venv from burying the container's Linux one
       - /app/.venv
+    environment:
+      # Connection string the app reads - "db" is the service name below, used as a hostname
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/todos
+    depends_on:
+      db:
+        # Wait until Postgres actually accepts connections, not just until it starts
+        condition: service_healthy
+
+  # Postgres with the pgvector extension already built in
+  db:
+    image: pgvector/pgvector:pg18
+    environment:
+      # Created automatically the first time the volume is empty
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=todos
+
+    ports:
+      # Exposed so you can connect from TablePlus or psql on your Mac
+      - "5432:5432"
+    volumes:
+      # Named volume - your data survives "docker compose down"
+      - todo-db-data:/var/lib/postgresql
+
+    healthcheck:
+      # Postgres reports "started" before it can take queries, so test it properly
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+# Declares the named volume used by the db service
+volumes:
+  todo-db-data:
