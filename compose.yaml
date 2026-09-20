@@ -1,3 +1,4 @@
+name: taskboard
 services:
   # The FastAPI app
   api:
@@ -13,7 +14,7 @@ services:
       - /app/.venv
     environment:
       # Connection string the app reads - "db" is the service name below, used as a hostname
-      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/todos
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/taskboard
     depends_on:
       db:
         # Wait until Postgres actually accepts connections, not just until it starts
@@ -26,14 +27,14 @@ services:
       # Created automatically the first time the volume is empty
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=todos
+      - POSTGRES_DB=taskboard
 
     ports:
       # Exposed so you can connect from TablePlus or psql on your Mac
       - "5432:5432"
     volumes:
       # Named volume - your data survives "docker compose down"
-      - todo-db-data:/var/lib/postgresql
+      - taskboard-db-data:/var/lib/postgresql
 
     healthcheck:
       # Postgres reports "started" before it can take queries, so test it properly
@@ -43,4 +44,4 @@ services:
 
 # Declares the named volume used by the db service
 volumes:
-  todo-db-data:
+  taskboard-db-data:
