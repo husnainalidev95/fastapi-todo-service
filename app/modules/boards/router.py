@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.db import SessionDep
 from app.modules.boards.schemas import BoardCreate, BoardPublic
-from app.modules.boards.service import create_board
+from app.modules.boards.service import create_board, list_boards
 
 # Like @Controller('boards') - every route below starts with /boards.
 # tags groups these routes under one heading in /docs.
@@ -18,3 +18,9 @@ router = APIRouter(prefix="/boards", tags=["boards"])
 # get_session() - neither is created by us.
 def create(data: BoardCreate, session: SessionDep):
     return create_board(session, data)
+
+# list[...] because this returns every board, not one. Each item is filtered
+# through BoardPublic the same way as a single board.
+@router.get("/", response_model=list[BoardPublic])
+def list_all(session: SessionDep):
+    return list_boards(session)

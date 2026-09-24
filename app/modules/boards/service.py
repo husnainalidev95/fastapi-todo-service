@@ -1,4 +1,4 @@
-from sqlmodel import Session
+from sqlmodel import Session, select
 from app.models import Board
 from app.modules.boards.schemas import BoardCreate
 
@@ -14,3 +14,7 @@ def create_board(session: Session, data: BoardCreate) -> Board:
     # Reloads the row so board.id holds the value Postgres just generated
     session.refresh(board)
     return board
+
+# Read-only, so there's nothing to commit - just a SELECT of every row
+def list_boards(session: Session) -> list[Board]:
+    return session.exec(select(Board)).all()
