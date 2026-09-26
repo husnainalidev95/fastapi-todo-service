@@ -24,7 +24,8 @@ and I understand it.
 ### Where I am now
 
 Step 1, in progress. Postgres, Alembic migrations, and the `Board` / `Task` models exist.
-The CRUD endpoints themselves are not written yet — `/` still returns `{"Hello": "World"}`.
+Boards have full CRUD (`POST`, `GET` list, `GET` by id, `PATCH`, `DELETE`) under `/boards`.
+Tasks are next, built the same way in `app/modules/tasks/`.
 
 Docker (step 4) came early because it was the easiest way to run Postgres locally.
 It gets revisited properly when Redis and the worker land.
@@ -76,7 +77,14 @@ around enums, renames, and server defaults.
 
 ```
 app/
-  main.py              # FastAPI app and routes
+  main.py              # FastAPI app; registers each module's router
+  db.py                # engine + per-request session dependency (SessionDep)
+  modules/             # one folder per feature, like NestJS modules
+    boards/
+      router.py        # routes (the "controller") - HTTP concerns, 404s
+      service.py       # database work, takes the session as an argument
+      schemas.py       # request/response shapes (BoardCreate, BoardUpdate, BoardPublic)
+    tasks/             # next, same structure
   models/
     __init__.py        # imports every model so Alembic can see its table
     board.py           # Board table

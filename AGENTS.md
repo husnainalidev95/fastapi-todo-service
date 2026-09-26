@@ -40,6 +40,12 @@ write it out in your reply and I'll use it.
 - **Direction.** What the next step is and what concepts I should read up on first.
 - Occasionally, a specific edit I describe. Do exactly that edit, nothing more.
 
+## Project structure
+
+Features live in `app/modules/<name>/` as `router.py`, `service.py`, and `schemas.py`
+(modular, like NestJS). Table models stay in `app/models/` so Alembic can find them.
+Follow this pattern when explaining or reviewing new features.
+
 ## Comment style
 
 The comments in this repo are my study notes. When I ask you to add comments, match what's
