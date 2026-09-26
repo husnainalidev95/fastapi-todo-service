@@ -15,3 +15,9 @@ class BoardCreate(BoardBase):
 # send back has already been saved and Postgres has given it one.
 class BoardPublic(BoardBase):
     id: int
+
+# What PATCH accepts. Everything is optional so a client can send just the one
+# field it wants to change.
+class BoardUpdate(BoardBase):
+    name: str | None = None
+    description: str | None = None

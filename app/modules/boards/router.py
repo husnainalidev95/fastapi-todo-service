@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.db import SessionDep
-from app.modules.boards.schemas import BoardCreate, BoardPublic
-from app.modules.boards.service import create_board, list_boards
+from app.modules.boards.schemas import BoardCreate, BoardPublic, BoardUpdate
+from app.modules.boards.service import create_board, list_boards, get_board, update_board, delete_board
 
 # Like @Controller('boards') - every route below starts with /boards.
 # tags groups these routes under one heading in /docs.
@@ -24,3 +24,28 @@ def create(data: BoardCreate, session: SessionDep):
 @router.get("/", response_model=list[BoardPublic])
 def list_all(session: SessionDep):
     return list_boards(session)
+
+# {board_id} is a path parameter. FastAPI matches it to the argument of the same
+# name and turns "abc" into a 422, because the argument is typed as int.
+@router.get("/{board_id}", response_model=BoardPublic)
+def get_one(board_id: int, session: SessionDep):
+    board = get_board(session, board_id)
+    if board is None:
+        raise HTTPException(status_code=404, detail="Board not found")
+    return board
+
+@router.patch("/{board_id}", response_model=BoardPublic)
+def update_one(board_id: int, data: BoardUpdate, session: SessionDep):
+    board = get_board(session, board_id)
+    if board is None:
+        raise HTTPException(status_code=404, detail="Board not found")
+    return update_board(session, board, data)
+
+# 204 means success with no body - there's nothing left to send back, so no
+# response_model either.
+@router.delete("/{board_id}", status_code=204)
+def delete_one(board_id: int, session: SessionDep):
+    board = get_board(session, board_id)
+    if board is None:
+        raise HTTPException(status_code=404, detail="Board not found")
+    return delete_board(session, board)
